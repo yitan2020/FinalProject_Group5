@@ -10,7 +10,6 @@ Yi Tan <tan5@sheridan.desire2learn.com>
 #include "function.h"
 
 typedef struct node {
-    //char name[MAX_LEN];
     char* firstName;
     char* lastName;
     float income;
@@ -45,8 +44,9 @@ void listRecord(employee_t* head) {
     }
 }
 
-
-void readIn(employee_t **head) {
+//read data from file and load to the new node for each record
+//return the pointer of the head of the list
+employee_t* readIn() {
     FILE *frp;
     if ((frp = fopen(IN_FILE, "r")) == NULL) {
         perror("Could not open quotes file to input!\n");
@@ -54,33 +54,56 @@ void readIn(employee_t **head) {
     }
     char firstName[MAX_LEN];
     char lastName[MAX_LEN];
-    int no;
     float income;
     size_t SIN;
-    employee_t *new_node = NULL, *current = NULL;
-    current = *head;
+    employee_t* new_node = NULL;
+    employee_t* head = NULL;
 
-    
     rewind(frp);
-    while (!feof(frp)) {
-        fscanf(frp, "%d,%f,%u,%[^,],%s\n", &no, &income, &SIN, firstName, lastName);
-        
-         if ((new_node = loadNode(income, SIN, firstName, lastName)) != NULL) {
 
-            if (current == NULL) {
-                *head = new_node;
-                current = new_node;
-            } else {
+    char buf[10000];
 
-                insertNode(&new_node, head);
+    int field_count=0;
+    
+    while(fgets(buf, 10000, frp)) {
+        printf("File to load records from:%s \n",IN_FILE);
+        field_count=0;
+        RMNR(buf);
+        // reference from https://codingboost.com/parsing-csv-files-in-c
+        char* field =strtok(buf, ",");
+        while(field) {
+            if (field_count %4== 0) {
+                income = strtof(field, NULL);
+                printf("Income:\t %f\n", income);
             }
-         }
-        
-    }
-    //}
-    printf("File to load records from:%s \n",IN_FILE);
+            if (field_count %4== 1) {
+                SIN =strtol(field, NULL,0);
+                printf("SIN:\t %zd\n", SIN);
+            }
+            if (field_count %4== 2) {
+                strcpy(firstName, field);
+                printf("First Name:\t %s\n", firstName);
+            }
+            if (field_count %4 == 3) {
+                strcpy(lastName, field);
+                printf("Last Name:\t %s\n", lastName);
+            }
+            FLUSH;
 
+            field_count++;
+
+           if (field_count%4==0 && field_count>1) {
+                new_node = loadNode(income, SIN, firstName, lastName);
+            }
+            printf("the filed count is %d: \n", field_count);
+            field = strtok(NULL, ",");
+        }
+        
+        printf("\n");
+
+    }
     fclose(frp);
+    return head;
 }
 
 employee_t* loadNode(float income, size_t SIN, char firstName[], char lastName[]) {
@@ -98,6 +121,44 @@ employee_t* loadNode(float income, size_t SIN, char firstName[], char lastName[]
 
     node->next = NULL;
     return node;
+}
+
+void insertNode(employee_t* new_node, employee_t** head) {
+
+    employee_t* current = *head;
+    employee_t* insert = NULL;
+    
+    if(head==NULL) {
+        head = new_node;
+        (*new_node)->next =NULL;
+    }
+
+    while (current != NULL) {
+        if ((*new_node)->income >= current->income && *head == current) {
+
+            (*new_node)->next = current;
+            *head = *new_node;
+            current = *head;
+            break;
+        } else if ((*new_node)->income < current->income && current->next == NULL) {
+
+            current->next = *new_node;
+            (*new_node)->next == NULL;
+            current = *head;
+            break;
+
+        } else if ((*new_node)->income >= current->income) {
+
+            (*new_node)->next = current;
+            insert->next = *new_node;
+            current = *head;
+
+            break;
+
+        }
+        insert = current;
+        current = current->next;
+    }
 }
 
 void writeOut(employee_t * head) {
@@ -260,38 +321,7 @@ void addRecord(employee_t **head) {
 
 //insert a node function
 
-void insertNode(employee_t** new_node, employee_t** head) {
 
-    employee_t* current = *head;
-    employee_t* insert = NULL;
-
-    while (current != NULL) {
-        if ((*new_node)->income >= current->income && *head == current) {
-
-            (*new_node)->next = current;
-            *head = *new_node;
-            current = *head;
-            break;
-        } else if ((*new_node)->income < current->income && current->next == NULL) {
-
-            current->next = *new_node;
-            (*new_node)->next == NULL;
-            current = *head;
-            break;
-
-        } else if ((*new_node)->income >= current->income) {
-
-            (*new_node)->next = current;
-            insert->next = *new_node;
-            current = *head;
-
-            break;
-
-        }
-        insert = current;
-        current = current->next;
-    }
-}
 
 //remove a list function
 

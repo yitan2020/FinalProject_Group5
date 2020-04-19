@@ -100,7 +100,7 @@ void readIn_LinkedList(employee_t** head) {
             field_count++;
 
            if (field_count%4==0 && field_count>1) {
-                new_node = loadNode_LinkedList(income, SIN, firstName, lastName);
+                new_node = createNode_LinkedList(income, SIN, firstName, lastName);
                 if(*head==NULL) {
                     *head = new_node;
                 } else {
@@ -118,7 +118,7 @@ void readIn_LinkedList(employee_t** head) {
 }
 
 //used inside of the readIn function to create a node for each record 
-employee_t* loadNode_LinkedList(float income, size_t SIN, char firstName[], char lastName[]) {
+employee_t* createNode_LinkedList(float income, size_t SIN, char firstName[], char lastName[]) {
 
     employee_t* node = NULL;
     node = (employee_t*) malloc(sizeof (employee_t));
@@ -134,41 +134,18 @@ employee_t* loadNode_LinkedList(float income, size_t SIN, char firstName[], char
     node->next = NULL;
     return node;
 }
-// used inside of the readIn function to add the node to the linked list 
-//this is a sorted linked list by descending the Annual income
+// used inside of the readIn function to add the node to the front of linked list 
 void insertNode_LinkedList(employee_t* new_node, employee_t** head) {
 
     employee_t* current = *head;
     employee_t* insert = NULL;
+    
+    new_node->next = *head;
+    *head = new_node;
    
-
-    while (current != NULL) {
-        if (new_node->income >= current->income && *head == current) {
-
-            new_node->next = current;
-            *head = new_node;
-            current = *head;
-            break;
-        } else if (new_node->income < current->income && current->next == NULL) {
-
-            current->next = new_node;
-            new_node->next == NULL;
-            current = *head;
-            break;
-
-        } else if (new_node->income >= current->income) {
-
-            new_node->next = current;
-            insert->next = new_node;
-            current = *head;
-
-            break;
-
-        }
-        insert = current;
-        current = current->next;
-    }
 }
+
+
 
 void writeOut(employee_t * head) {
 
@@ -361,148 +338,6 @@ void removeList(employee_t** head) {
     }
 }
 
-// below functions for BST FIND operation 
-void findOperation() {
-    BST_node* root = NULL;
-    
-    int option;
-
-    do {
-    printf("Please select the attribute (1=SIN, 2 =First Name, 3=Last Name, 4=Annual Income: \n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-    option =strtof(temp_BST, NULL);   
-    
-    } while(option >4 || option <1 );
-    
-    temp_BST == NULL; 
-    
-    switch (option) {
-            case 1: 
-                readIn_BST(&root);
-                findBySin(root);
-                break;
-            case 2: 
-                readIn_BST(&root);
-                do{
-                findByFirstName(root);
-                } while(temp_BST !=NULL);
-                do{
-                printf("Save displayed records in the file(Eneter to skip):\n");
-                } while(temp_BST !=NULL); 
-                break;
-            case 3:
-               readIn_BST(&root); 
-               findByLastName(root);
-               break;
-            case 4: 
-               readIn_BST(&root);
-               findByIncome(root);
-               break;
-            default: 
-                printf("Error! operator is not correct");
-        }
-    
-  
-    
-    
-}
-
-void findBySin(BST_node* root) {
-   
-    char temp_BST[MAX_LEN];
-    do {
-    printf("Please provide the SIN you want to find: \n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-   
-    if (strlen(temp_BST) != 9) {
-            printf("Incorrect SIN. Please try again. \n");
-        }
-    } while(strlen(temp_BST) !=9); 
-    
-    size_t SIN = (size_t) strtol(temp_BST, NULL,0);
-    count=0;
-    printf("Displaying record(s) with SIN \"%zd\": \n", SIN);
-    tree_traversalBySin(root, SIN);
-    
-    if(count==0) {
-        printf("No records found!");
-    }
- 
-    
-}
-void findByIncome(BST_node* root) {
-
-    char temp_BST[MAX_LEN];
-    float income;
-    do {
-    printf("Please provide the income you want to find: \n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-    if (strlen(temp_BST) <=0) {
-            printf("Incorrect income. Please try again. \n");
-        }
-    } while(strlen(temp_BST) <=0); 
-    income = strtof(temp_BST, NULL);
-    
-    
-
-    count=0;
-    printf("Displaying record(s) with SIN \"%5.2f\": \n", income);
-    tree_traversalByIncome(root, income);
-    
-    if(count==0) {
-        printf("No records found!");
-    }
- 
-    
-}
-void findByFirstName(BST_node* root) {
-    
-   
-    do {
-    printf("Please provide the first name you want to find: (Press enter to skip)\n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-    if (strlen(temp_BST) <=0) {
-            printf("First Name cannot be empty \n");
-        }
-    } while(strlen(temp_BST) <=0); 
-  
-    count=0;
-    printf("Displaying record(s) with first name \"%s\": \n", temp_BST);
-    tree_traversalByFirstName(root,temp_BST);
-     if(count==0) {
-        printf("No records found!");
-    }
-    
-}
-void findByLastName(BST_node* root) {
-    
-    
-    do {
-    printf("Please provide the last name you want to find: \n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-    if (strlen(temp_BST) <=0) {
-            printf("last Name cannot be empty \n");
-        }
-    } while(strlen(temp_BST) <=0); 
-    count=0;
-    printf("Displaying record(s) with last name \"%s\": \n", temp_BST);
-    tree_traversalByLastName(root,temp_BST);
-     if(count==0) {
-        printf("No records found!");
-    }
-    
-}
-
 
 void readIn_BST(BST_node** root) {
     FILE *frp;
@@ -639,8 +474,158 @@ void tree_traversal(BST_node* root) {
     }
 }
 
+// below functions for BST FIND operation 
+void findOperation() {
+    BST_node* root = NULL;
+    
+    int option;
+    count=0;
+    size_t SIN;
+    float income;
+    char* firstName;
+    char* lastName;
+
+    
+    printf("Please select the attribute (1=SIN, 2 =First Name, 3=Last Name, 4=Annual Income: \n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+    option =strtol(temp_BST, NULL,0);   
+    temp_BST == NULL; 
+    readIn_BST(&root);  
+
+ 
+    switch (option) {
+            case 1: 
+                SIN = getSin();
+                printf("Displaying record(s) with SIN \"%zd\": \n", SIN);
+                count=0;
+                tree_traversalBySin(root, SIN);                 
+                break;
+            case 2: 
+                count=0;
+                firstName = getFirstName();
+                printf("Displaying record(s) with first name \"%s\": \n", firstName);
+                tree_traversalByFirstName(root,firstName); 
+                free(firstName);
+                break;
+            case 3:
+               count=0;
+                lastName = getLastName();
+                printf("Displaying record(s) with last name \"%s\": \n", lastName);
+                tree_traversalByLastName(root,lastName); 
+                free(lastName);
+               break;
+            case 4: 
+                income=getIncome();
+                printf("Displaying record(s) with income \"%5.2f\": \n", income);
+                count=0;
+                tree_traversalByIncome(root,income);
+                break;
+            default: 
+                printf("Error! operator is not correct");
+        }
+    
+    if(count==0) {
+                printf("No records found!\n");
+            }
+
+      
+  
+    
+    
+}
+
+
+
+//get the input of SIN from console
+size_t getSin() {
+    size_t SIN;
+    do {
+    printf("Please provide the SIN you want to find: \n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+   
+    
+    if (strlen(temp_BST) != 9) {
+            printf("Incorrect SIN. Please try again. \n");
+        }
+
+    } while(strlen(temp_BST) <9); 
+    
+    SIN = (size_t) strtol(temp_BST, NULL,0);
+    
+    
+    return SIN;
+}
+
+//get the input of SIN from console
+size_t getIncome() {
+    char temp_BST[MAX_LEN];
+    float income;
+    //do {
+    printf("Please provide the income you want to find: \n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+/*
+    if (strlen(temp_BST) <=0) {
+            printf("Incorrect income. Please try again. \n");
+        }
+*/
+    //} while(strlen(temp_BST) <=0); 
+    income = strtof(temp_BST, NULL);
+    
+    return income;
+}
+
+//get the input of first name from console
+char* getFirstName() {
+   // do {
+    printf("Please provide the first name you want to find: (Press enter to skip)\n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+/*
+    if (strlen(temp_BST) <0) {
+            printf("First Name cannot be empty \n");
+        }
+*/
+    //} while(strlen(temp_BST) <0); 
+
+    char* firstName = (char*) malloc((strlen(temp_BST)+1)*sizeof(char));
+    strcpy(firstName, temp_BST);
+    
+
+    return firstName;
+    
+ 
+}
+//get the input of the last name from console
+char* getLastName() {
+    //do {
+    printf("Please provide the last name you want to find: (Press enter to skip)\n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+/*
+    if (strlen(temp_BST) <0) {
+            printf("First Name cannot be empty \n");
+        }
+*/
+    //} while(strlen(temp_BST) <0); 
+
+    char* lastName = (char*) malloc((strlen(temp_BST)+1)*sizeof(char));
+    strcpy(lastName, temp_BST);
+    
+
+    return lastName;
+    
+}
+
 void tree_traversalBySin(BST_node* root, size_t SIN) {
-     
+
     if (root != NULL) {
 
         if(root->SIN == SIN) {
@@ -650,6 +635,7 @@ void tree_traversalBySin(BST_node* root, size_t SIN) {
         tree_traversalBySin(root->leftChild, SIN);
         tree_traversalBySin(root->rightChild, SIN);
     }
+
     
 }
 
@@ -667,7 +653,7 @@ void tree_traversalByIncome(BST_node* root, float income) {
     
 }
 
-void tree_traversalByFirstName(BST_node* root, char firstName[]) {
+void tree_traversalByFirstName(BST_node* root, char* firstName) {
 
     if (root != NULL) {
         if(! strcmp(root->firstName, firstName)) {
@@ -679,7 +665,7 @@ void tree_traversalByFirstName(BST_node* root, char firstName[]) {
         tree_traversalByFirstName(root->rightChild, firstName);
     }
 }
-void tree_traversalByLastName(BST_node* root, char lastName[]) {
+void tree_traversalByLastName(BST_node* root, char* lastName) {
 
     if (root != NULL) {
         if(! strcmp(root->lastName, lastName)) {

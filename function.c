@@ -950,7 +950,7 @@ void insertNode_BSTByFirstNameForSort(BST_node** root, BST_node* node) {
         do {
             parent = current;
             //go left from parent
-            if (node->firstName <= parent->firstName) {
+            if (strcmp(node->firstName, parent->firstName)<=0) {
                 current = current ->leftChild;
                 if (current == NULL) {
                     parent->leftChild = node;

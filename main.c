@@ -54,7 +54,7 @@ int main() {
         case 3:
             //can find and display the search result but cannot save the result yet 
             //after each search, cannot go back to repeat the same attribute search 
-            findOperation();
+            //findOperation();
             break;
         case 4:
         {
@@ -63,7 +63,7 @@ int main() {
         }
             break;
         case 5:
-            printf("5");
+            deleteOperation(); 
             break;
         default:
             printf("2");

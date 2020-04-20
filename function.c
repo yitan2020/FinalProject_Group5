@@ -338,6 +338,210 @@ void removeList(employee_t** head) {
     }
 }
 
+void deleteOperation() {
+    int option;
+    employee_t* head = NULL;
+    count = 0;
+    size_t SIN;
+    float income;
+    char* firstName;
+    char* lastName;
+
+    printf("Please select the attribute (1=SIN, 2 =First Name, 3=Last Name, 4=Annual Income: \n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+    option = strtol(temp_BST, NULL, 0);
+    temp_BST == NULL;
+
+    readIn_LinkedList(&head);
+
+    switch (option) {
+        case 1:
+            SIN = getSin();
+            printf("Deleting record(s) with SIN \"%zd\": \n", SIN);
+            count = 0;
+            deleteNodeBySIN(&head, SIN);
+            if(count==0) {
+                printf("no matching record! no deletion!\n");
+            }
+            break;
+        case 2:
+            firstName = getFirstName();
+            printf("Deleting record(s) with first name \"%s\": \n", firstName);
+            count=0;
+            deleteNodeByFirstName(&head, firstName);
+            if(count==0) {
+                printf("no matching record! no deletion!\n");
+            }
+            free(firstName);
+            break;
+        case 3:
+            lastName = getLastName();
+            printf("Deleting record(s) with last name \"%s\": \n", lastName);
+            count=0;
+            deleteNodeByLastName(&head, lastName);
+            if(count==0) {
+                printf("no matching record! no deletion!\n");
+            }
+            free(lastName);
+            break;
+        case 4:
+            income = getIncome();
+            printf("Deleting record(s) with income \"%f\": \n", income);
+            count = 0;
+            deleteNodeByIncome(&head, income);
+            if(count==0) {
+                printf("no matching record! no deletion!\n");
+            }
+            break;
+        default:
+            printf("Error! operator is not correct");
+    }
+
+    listRecord(head);
+
+
+
+}
+
+void deleteNodeBySIN(employee_t** head, size_t SIN) {
+
+    //if the list has only one node and this node is the one needed to be deleted
+    while ((*head)->SIN == SIN) {
+        if ((*head)->next != NULL) {
+            removeFirst(head);
+            count++;
+        }
+    }
+
+    employee_t* current = *head;
+    while (current->next != NULL) {
+        current = current ->next;
+    }
+    if (current->SIN == SIN) {
+        current = *head;
+        removeLast(head);
+        count++;
+    }
+
+    current = *head;
+    employee_t* temp = NULL;
+    while (current->next != NULL) {
+        if (current->next ->SIN == SIN) {
+            temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+            count++;
+        }
+        current = current ->next;
+
+    }
+
+}
+
+void deleteNodeByIncome(employee_t** head, float income) {
+
+    //if the list has only one node and this node is the one needed to be deleted
+    while ((*head)->income == income) {
+        if ((*head)->next != NULL) {
+            removeFirst(head);
+            count++;
+        }
+    }
+
+    employee_t* current = *head;
+    while (current->next != NULL) {
+        current = current ->next;
+    }
+    if (current->income == income) {
+        current = *head;
+        removeLast(head);
+        count++;
+    }
+
+    current = *head;
+    employee_t* temp = NULL;
+    while (current->next != NULL) {
+        if (current->next ->income == income) {
+            temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+            count++;
+        }
+        current = current ->next;
+    }
+
+}
+
+void deleteNodeByFirstName(employee_t** head, char* firstName) {
+    //if the list has only one node and this node is the one needed to be deleted
+    while (strcmp((*head)->firstName, firstName) == 0) {
+        if ((*head)->next != NULL) {
+            removeFirst(head);
+            count++;
+        }
+    }
+    // delete the last node 
+    employee_t* current = *head;
+    while (current->next != NULL) {
+        current = current ->next;
+    }
+    if (strcmp(current->firstName, firstName) == 0) {
+        current = *head;
+        removeLast(head);
+        count++;
+    }
+
+    current = *head;
+    employee_t* temp = NULL;
+    while (current->next != NULL) {
+        if (strcmp(current->next ->firstName, firstName) == 0) {
+            temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+            count++;
+        }
+        current = current ->next;
+    }
+
+
+}
+
+void deleteNodeByLastName(employee_t** head, char* lastName) {
+    //if the list has only one node and this node is the one needed to be deleted
+    while (strcmp((*head)->lastName, lastName) == 0) {
+        if ((*head)->next != NULL) {
+            removeFirst(head);
+            count++;
+        }
+    }
+    // delete the last node 
+    employee_t* current = *head;
+    while (current->next != NULL) {
+        current = current ->next;
+    }
+    if (strcmp(current->lastName, lastName) == 0) {
+        current = *head;
+        removeLast(head);
+        count++;
+    }
+
+    current = *head;
+    employee_t* temp = NULL;
+    while (current->next != NULL) {
+        if (strcmp(current->next ->lastName, lastName) == 0) {
+            temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+            count++;
+        }
+        current = current ->next;
+    }
+
+
+}
+
 
 void readIn_BST(BST_node** root) {
     FILE *frp;
@@ -536,13 +740,11 @@ void findOperation() {
     
 }
 
-
-
 //get the input of SIN from console
 size_t getSin() {
     size_t SIN;
     do {
-    printf("Please provide the SIN you want to find: \n");
+    printf("Please provide the SIN: \n");
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
@@ -565,7 +767,7 @@ size_t getIncome() {
     char temp_BST[MAX_LEN];
     float income;
     //do {
-    printf("Please provide the income you want to find: \n");
+    printf("Please provide the income: \n");
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
@@ -583,7 +785,7 @@ size_t getIncome() {
 //get the input of first name from console
 char* getFirstName() {
    // do {
-    printf("Please provide the first name you want to find: (Press enter to skip)\n");
+    printf("Please provide the first name: (Press enter to skip)\n");
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
@@ -605,7 +807,7 @@ char* getFirstName() {
 //get the input of the last name from console
 char* getLastName() {
     //do {
-    printf("Please provide the last name you want to find: (Press enter to skip)\n");
+    printf("Please provide the last name: (Press enter to skip)\n");
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
@@ -676,4 +878,34 @@ void tree_traversalByLastName(BST_node* root, char* lastName) {
         tree_traversalByLastName(root->leftChild, lastName);
         tree_traversalByLastName(root->rightChild, lastName);
     }
+}
+
+void removeFirst(employee_t **head) {
+    if (*head == NULL) {
+        printf("Linked List is already empty!");
+    } else {
+        employee_t *toDelete = *head;
+        //*head=(*head)->next;
+        *head = toDelete->next;
+        free(toDelete);
+    }
+}
+
+void removeLast(employee_t ** head) {
+    if (*head == NULL) {
+        printf("Linked List is already empty!");
+    } else if ((*head)->next == NULL) {
+        free(*head);
+        *head = NULL;
+    } else {
+        employee_t * current = *head;
+        while (current->next->next != NULL) {
+
+            current = current ->next;
+        }
+        free(current->next);
+        current->next = NULL;
+
+    }
+
 }

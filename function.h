@@ -36,12 +36,19 @@ employee_t* createNode(); // function to create the node
 employee_t* createList(); // function to create the list
 void listRecord(employee_t*); // function to display the list
 void addRecord(employee_t**);
-void readIn_LinkedList(employee_t**); //read data from file and created a sorted linked list
+void readIn_LinkedList(employee_t**); //read data from file and created a linked list
 employee_t * createNode_LinkedList(float, size_t, char[], char[]);
 void writeOut(employee_t*);
 void insertNode_LinkedList(employee_t*, employee_t**); // function to insert node into the sorted linked list.
 void removeList(employee_t**); // function to delete the linked list
 
+void deleteOperation(); //function to delete a node
+void deleteNodeBySIN(employee_t**, size_t);// used inside of the deleteOperation() to remove the node
+void deleteNodeByIncome(employee_t**, float);
+void deleteNodeByFirstName(employee_t**, char*);
+void deleteNodeByLastName(employee_t**, char*);
+void removeLast(employee_t **);
+void removeFirst(employee_t **);
 
 //functions for BST 
 void readIn_BST(BST_node**); 

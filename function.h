@@ -38,7 +38,7 @@ void listRecord(employee_t*); // function to display the list
 void addRecord(employee_t**);
 void readIn_LinkedList(employee_t**); //read data from file and created a linked list
 employee_t * createNode_LinkedList(float, size_t, char[], char[]);
-void writeOut(employee_t*);
+void writeOutForLinkedList(employee_t * head);
 void insertNode_LinkedList(employee_t*, employee_t**); // function to insert node into the sorted linked list.
 void removeList(employee_t**); // function to delete the linked list
 
@@ -63,6 +63,9 @@ void tree_traversalByFirstName(BST_node*, char*);
 void tree_traversalByLastName(BST_node* , char*);
 void tree_traversalByIncome(BST_node*, float);
 void searchByAttribute(BST_node*, int);
+void sortByAscendingForWriteout(BST_node*, FILE*);
+void sortByDescendingForWriteout(BST_node*, FILE*);
+void writeOutForBST(BST_node*, int);
 
 //functions for sort
 void sortOperation();

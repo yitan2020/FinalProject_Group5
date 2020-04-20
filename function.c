@@ -140,14 +140,14 @@ void insertNode_LinkedList(employee_t* new_node, employee_t** head) {
    
 }
 
-void writeOut(employee_t * head) {
+void writeOutForLinkedList(employee_t * head) {
 
     int no = 1;
     FILE *fwp;
     char save[MAX_LEN];
     char override[MAX_LEN];
 
-    printf("Save all records in the file(Enter to skip):");
+    printf("Save all records into file(Enter to skip):");
     fgets(save, MAX_LEN, stdin);
     FLUSH;
     save[strcspn(save, "\n")] = 0;
@@ -167,7 +167,6 @@ void writeOut(employee_t * head) {
             exit(1);
         }
     } else {
-
         fwp = fopen(save, "w");
         printf("Data saved in the file %s \n", save);
     }
@@ -176,12 +175,67 @@ void writeOut(employee_t * head) {
     employee_t* current = head;
     while (current != NULL) {
 
-        fprintf(fwp, "%d,%9f,%u,%s,%s\n", no++, current->income, current->SIN, current->firstName, current->lastName);
+        fprintf(fwp, "%9f,%u,%s,%s\n", current->income, current->SIN, current->firstName, current->lastName);
         current = current->next;
     }
     fclose(fwp);
 
 
+}
+void writeOutForBST(BST_node* root, int option) {
+
+    int no = 1;
+    FILE* fwp;
+    char save[MAX_LEN];
+    char override[MAX_LEN];
+
+    printf("Save all records into file(Enter to skip):");
+    fgets(save, MAX_LEN, stdin);
+    FLUSH;
+    save[strcspn(save, "\n")] = 0;
+
+
+    //if a file exits or not
+    if ((fwp = fopen(save, "r")) != NULL) {
+        printf("File %s already exit. Do you want to override it?(Y/N):", save);
+
+        fgets(override, MAX_LEN, stdin);
+        FLUSH;
+        override[strcspn(override, "\n")] = 0;
+        if (strcmp(override, "N") > 0) {
+            fwp = fopen(save, "w+");
+            printf("Data saved in the file %s \n", save);
+        } else {
+            exit(1);
+        }
+    } else {
+        fwp = fopen(save, "w");
+        printf("Data saved in the file %s \n", save);
+    }
+
+    //save data to the file
+    if(option==1) {
+        sortByAscendingForWriteout(root, fwp);
+    } else {
+        sortByDescendingForWriteout(root, fwp);
+    }
+    fclose(fwp);
+
+
+}
+void sortByAscendingForWriteout(BST_node* root, FILE* fwp) {
+    if (root != NULL) {
+        sortByAscendingForWriteout(root->leftChild, fwp);
+        fprintf(fwp, "%9f,%u,%s,%s\n", root->income, root->SIN, root->firstName, root->lastName);
+        sortByAscendingForWriteout(root->rightChild, fwp);
+    }
+}
+void sortByDescendingForWriteout(BST_node* root, FILE* fwp) {
+    if (root != NULL) {
+        sortByDescendingForWriteout(root->rightChild,fwp);
+        fprintf(fwp, "%9f,%u,%s,%s\n", root->income, root->SIN, root->firstName, root->lastName);
+        sortByDescendingForWriteout(root->leftChild,fwp);
+    }
 }
 
 // this function collect input from console and then create a new node of employee_t for the linked list
@@ -269,6 +323,8 @@ void addOperation() {
     
     employee_t* newNode = createNewNode();
     insertNode_LinkedList(newNode,  &head);
+    
+    writeOutForLinkedList(head); 
     
      listRecord(head);
     
@@ -901,9 +957,11 @@ void sortOperation() {
             if(strtol(temp_BST, NULL, 0)==1) {
                 printf("Displaying records sorted by SIN in ascending order: \n");
                sortByAscending(root);
+               writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by SIN in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         case 2: 
@@ -911,9 +969,11 @@ void sortOperation() {
             if(strtol(temp_BST, NULL, 0)==1) {
                 printf("Displaying records sorted by first name in ascending order: \n");
                sortByAscending(root);
+               writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by first name in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         case 3:
@@ -921,9 +981,11 @@ void sortOperation() {
             if(strtol(temp_BST, NULL, 0)==1) {
                 printf("Displaying records sorted by income in ascending order: \n");
                sortByAscending(root);
+               writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by income in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         case 4:
@@ -931,9 +993,11 @@ void sortOperation() {
             if(strtol(temp_BST, NULL, 0)==1) {
                 printf("Displaying records sorted by income in ascending order: \n");
                sortByAscending(root);
+               writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by income in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         default:

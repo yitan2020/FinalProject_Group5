@@ -42,6 +42,7 @@ void writeOut(employee_t*);
 void insertNode_LinkedList(employee_t*, employee_t**); // function to insert node into the sorted linked list.
 void removeList(employee_t**); // function to delete the linked list
 
+void addOperation(); //function used to implement add operation
 void deleteOperation(); //function to delete a node
 void deleteNodeBySIN(employee_t**, size_t);// used inside of the deleteOperation() to remove the node
 void deleteNodeByIncome(employee_t**, float);
@@ -63,7 +64,15 @@ void tree_traversalByLastName(BST_node* , char*);
 void tree_traversalByIncome(BST_node*, float);
 void searchByAttribute(BST_node*, int);
 
-
+//functions for sort
+void sortOperation();
+void insertNode_BSTBySinForSort(BST_node**, BST_node*);
+void insertNode_BSTByIncomeForSort(BST_node**, BST_node* ); 
+void insertNode_BSTByFirstNameForSort(BST_node**, BST_node* );
+void insertNode_BSTByLastNameForSort(BST_node**, BST_node* );
+void sortByAscending(BST_node*);
+void sortByDescending(BST_node*);
+void readIn_BSTForSort(BST_node**, int);
 
 #endif /* FUNCTION_H */
 

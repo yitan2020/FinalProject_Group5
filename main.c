@@ -49,18 +49,13 @@ int main() {
             listRecord(head);
             break;
         case 2:
-            printf("2");
+            sortOperation();
             break;
         case 3:
-            //can find and display the search result but cannot save the result yet 
-            //after each search, cannot go back to repeat the same attribute search 
-            //findOperation();
+            findOperation();
             break;
         case 4:
-        {
-            //addRecord(&head);
-            writeOut(head);
-        }
+            addOperation();
             break;
         case 5:
             deleteOperation(); 

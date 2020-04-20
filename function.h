@@ -58,10 +58,10 @@ BST_node* loadNode_BST(float, size_t, char[], char[]);
 void displayBST(BST_node* root);  // just for testing purpose 
 void tree_traversal(BST_node*);
 void findOperation();
-void tree_traversalBySin(BST_node*, size_t);
-void tree_traversalByFirstName(BST_node*, char*);
-void tree_traversalByLastName(BST_node* , char*);
-void tree_traversalByIncome(BST_node*, float);
+void tree_traversalBySin(BST_node*, size_t, BST_node**);
+void tree_traversalByFirstName(BST_node*, char*, BST_node**);
+void tree_traversalByLastName(BST_node* , char*, BST_node**);
+void tree_traversalByIncome(BST_node*, float,BST_node**);
 void searchByAttribute(BST_node*, int);
 void sortByAscendingForWriteout(BST_node*, FILE*);
 void sortByDescendingForWriteout(BST_node*, FILE*);

@@ -381,6 +381,7 @@ void deleteOperation() {
             if(count==0) {
                 printf("no matching record! no deletion!\n");
             }
+            writeOutForLinkedList(head);
             break;
         case 2:
             firstName = getFirstName();
@@ -391,6 +392,7 @@ void deleteOperation() {
                 printf("no matching record! no deletion!\n");
             }
             free(firstName);
+            writeOutForLinkedList(head);
             break;
         case 3:
             lastName = getLastName();
@@ -401,6 +403,7 @@ void deleteOperation() {
                 printf("no matching record! no deletion!\n");
             }
             free(lastName);
+            writeOutForLinkedList(head);
             break;
         case 4:
             income = getIncome();
@@ -410,6 +413,7 @@ void deleteOperation() {
             if(count==0) {
                 printf("no matching record! no deletion!\n");
             }
+            writeOutForLinkedList(head);
             break;
         default:
             printf("Error! operator is not correct");
@@ -706,6 +710,7 @@ void tree_traversal(BST_node* root) {
 // below functions for BST FIND operation 
 void findOperation() {
     BST_node* root = NULL;
+    BST_node* root_result = NULL;
     
     int option;
     count=0;
@@ -723,33 +728,36 @@ void findOperation() {
     temp_BST == NULL; 
     readIn_BST(&root);  
 
- 
     switch (option) {
             case 1: 
                 SIN = getSin();
                 printf("Displaying record(s) with SIN \"%zd\": \n", SIN);
                 count=0;
-                tree_traversalBySin(root, SIN);                 
+                tree_traversalBySin(root, SIN, &root_result);  
+                writeOutForBST(root_result, 1);
                 break;
             case 2: 
                 count=0;
                 firstName = getFirstName();
                 printf("Displaying record(s) with first name \"%s\": \n", firstName);
-                tree_traversalByFirstName(root,firstName); 
+                tree_traversalByFirstName(root,firstName,&root_result);
+                writeOutForBST(root_result, 1);
                 free(firstName);
                 break;
             case 3:
                count=0;
                 lastName = getLastName();
                 printf("Displaying record(s) with last name \"%s\": \n", lastName);
-                tree_traversalByLastName(root,lastName); 
+                tree_traversalByLastName(root,lastName,&root_result);
+                writeOutForBST(root_result, 1);
                 free(lastName);
                break;
             case 4: 
                 income=getIncome();
                 printf("Displaying record(s) with income \"%5.2f\": \n", income);
                 count=0;
-                tree_traversalByIncome(root,income);
+                tree_traversalByIncome(root,income,&root_result);
+                writeOutForBST(root_result, 1);
                 break;
             default: 
                 printf("Error! operator is not correct");
@@ -850,57 +858,81 @@ char* getLastName() {
     
 }
 
-void tree_traversalBySin(BST_node* root, size_t SIN) {
+void tree_traversalBySin(BST_node* root, size_t SIN, BST_node** root_result) {
 
     if (root != NULL) {
 
         if(root->SIN == SIN) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
+            BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
+            if(*root_result==NULL) {
+                *root_result = newNode;
+            } else {
+                insertNode_BST(root_result, newNode);
+            }
             count++;
         }
-        tree_traversalBySin(root->leftChild, SIN);
-        tree_traversalBySin(root->rightChild, SIN);
+        tree_traversalBySin(root->leftChild, SIN, root_result);
+        tree_traversalBySin(root->rightChild, SIN,root_result);
     }
 
     
 }
 
-void tree_traversalByIncome(BST_node* root, float income) {
+void tree_traversalByIncome(BST_node* root, float income,BST_node** root_result) {
      
     if (root != NULL) {
 
         if(root->income == income) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
+            BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
+            if(*root_result==NULL) {
+                *root_result = newNode;
+            } else {
+                insertNode_BST(root_result, newNode);
+            }
             count++;
         }
-        tree_traversalByIncome(root->leftChild, income);
-        tree_traversalByIncome(root->rightChild, income);
+        tree_traversalByIncome(root->leftChild, income,root_result);
+        tree_traversalByIncome(root->rightChild, income,root_result);
     }
     
 }
 
-void tree_traversalByFirstName(BST_node* root, char* firstName) {
+void tree_traversalByFirstName(BST_node* root, char* firstName, BST_node** root_result) {
 
     if (root != NULL) {
         if(! strcmp(root->firstName, firstName)) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
+            BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
+            if(*root_result==NULL) {
+                *root_result = newNode;
+            } else {
+                insertNode_BST(root_result, newNode);
+            }
             count++;
         }
 
-        tree_traversalByFirstName(root->leftChild, firstName);
-        tree_traversalByFirstName(root->rightChild, firstName);
+        tree_traversalByFirstName(root->leftChild, firstName,root_result);
+        tree_traversalByFirstName(root->rightChild, firstName,root_result);
     }
 }
-void tree_traversalByLastName(BST_node* root, char* lastName) {
+void tree_traversalByLastName(BST_node* root, char* lastName,BST_node** root_result) {
 
     if (root != NULL) {
         if(! strcmp(root->lastName, lastName)) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
+            BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
+            if(*root_result==NULL) {
+                *root_result = newNode;
+            } else {
+                insertNode_BST(root_result, newNode);
+            }
             count++;
         }
         
-        tree_traversalByLastName(root->leftChild, lastName);
-        tree_traversalByLastName(root->rightChild, lastName);
+        tree_traversalByLastName(root->leftChild, lastName, root_result);
+        tree_traversalByLastName(root->rightChild, lastName, root_result);
     }
 }
 

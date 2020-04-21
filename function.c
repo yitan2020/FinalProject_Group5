@@ -349,25 +349,30 @@ void deleteOperation() {
             count = 0;
             do {
                 SIN = getSin();
+                if(SIN==0) {
+                    break;
+                }
                 printf("Deleting record(s) with SIN \"%zd\": \n", SIN);
                 deleteNodeBySIN(&head, SIN);
                 if (count == 0) {
                     printf("no matching record! no deletion!\n");
                 }
-            } while (count == 0);
+            } while (1);
             writeOutForLinkedList(head);
             break;
         case 2:
             count = 0;
             do {
                 firstName = getFirstName();
+                if(!(strcmp(firstName, ""))) {
+                    break;
+                }
                 printf("Deleting record(s) with first name \"%s\": \n", firstName);
-
                 deleteNodeByFirstName(&head, firstName);
                 if (count == 0) {
                     printf("no matching record! no deletion!\n");
                 }
-            } while (count == 0);
+            } while (1);
             free(firstName);
             writeOutForLinkedList(head);
             break;
@@ -375,26 +380,33 @@ void deleteOperation() {
             count = 0;
             do {
                 lastName = getLastName();
+                if(!(strcmp(lastName, ""))) {
+                    break;
+                }
                 printf("Deleting record(s) with last name \"%s\": \n", lastName);
 
                 deleteNodeByLastName(&head, lastName);
                 if (count == 0) {
                     printf("no matching record! no deletion!\n");
                 }
-            } while (count == 0);
+            } while (1);
             free(lastName);
             writeOutForLinkedList(head);
             break;
         case 4:
             count = 0;
+            
             do {
                 income = getIncome();
+                if(income<0) {
+                    break;
+                }
                 printf("Deleting record(s) with income \"%f\": \n", income);
                 deleteNodeByIncome(&head, income);
                 if (count == 0) {
                     printf("no matching record! no deletion!\n");
                 }
-            } while (count == 0);
+            } while (1);
             writeOutForLinkedList(head);
             break;
         default:

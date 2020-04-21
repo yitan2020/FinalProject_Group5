@@ -724,10 +724,6 @@ void findOperation() {
             printf("Error! operator is not correct");
     }
 
-
-
-    displayBST(root);
-
 }
 
 //get the input of SIN from console
@@ -922,9 +918,11 @@ void sortOperation() {
             if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by SIN in ascending order: \n");
                 sortByAscending(root);
+                writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by SIN in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         case 2:
@@ -932,9 +930,11 @@ void sortOperation() {
             if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by first name in ascending order: \n");
                 sortByAscending(root);
+                writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by first name in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         case 3:
@@ -942,9 +942,11 @@ void sortOperation() {
             if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by income in ascending order: \n");
                 sortByAscending(root);
+                writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by income in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         case 4:
@@ -952,9 +954,11 @@ void sortOperation() {
             if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by income in ascending order: \n");
                 sortByAscending(root);
+                writeOutForBST(root, 1);
             } else {
                 printf("Displaying records sorted by income in descending order: \n");
                 sortByDescending(root);
+                writeOutForBST(root, 2);
             }
             break;
         default:

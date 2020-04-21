@@ -19,7 +19,7 @@ Yi Tan <tan5@sheridan.desire2learn.com>
 #define MAX_LEN 50
 
 // --------------------------------------
-#define IN_FILE "input.txt"
+#define IN_FILE "input.csv"
 #define OUT_FILE "input.csv"
 
 typedef struct node employee_t;
@@ -27,7 +27,7 @@ typedef struct node employee_t;
 typedef struct node_BST BST_node;
 //functions for getting input from console
 size_t getSin();
-size_t getIncome();
+float getIncome();
 char* getFirstName();
 char* getLastName();
 

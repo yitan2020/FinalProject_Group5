@@ -26,10 +26,7 @@ Bin Chen <chbi@sheridancollege.com>
 int main() {
     char operator[10];
 
-
     employee_t *head = NULL;
-    BST_node* root = NULL;
-
 
     printf("Please select operations :\n");
     printf("1. List records\n");
@@ -47,6 +44,7 @@ int main() {
         case 1:
             readIn_LinkedList(&head);
             listRecord(head);
+            removeList(&head);
             break;
         case 2:
             sortOperation();
@@ -64,16 +62,6 @@ int main() {
             printf("2");
 
     }
-
-
-
-    //employee_t *head = createList();
-
-    //readIn(&head);
-    //displayList(head);
-
-    //writeOut(head);
-    //removeList(&head);
 
     return 0;
 }

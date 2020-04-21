@@ -26,9 +26,8 @@ struct node_BST {
     BST_node* rightChild;
 };
 
-int count; 
+int count;
 char temp_BST[MAX_LEN];
-
 
 void listRecord(employee_t* head) {
 
@@ -42,7 +41,7 @@ void listRecord(employee_t* head) {
     } else {
         employee_t* current = head;
         while (current != NULL) {
-            
+
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", current->SIN, current->firstName, current->lastName, current->income);
             current = current->next;
         }
@@ -53,10 +52,11 @@ void listRecord(employee_t* head) {
 //read data from file and load to the new node for each record
 //return the pointer of the head of the linked list which is sorted by the annual income
 //in descending order  
+
 void readIn_LinkedList(employee_t** head) {
     FILE *frp;
     if ((frp = fopen(IN_FILE, "r")) == NULL) {
-        perror("Could not open quotes file to input!\n");  
+        perror("Could not open quotes file to input!\n");
         exit(1);
     }
     char firstName[MAX_LEN];
@@ -64,55 +64,35 @@ void readIn_LinkedList(employee_t** head) {
     float income;
     size_t SIN;
     employee_t* new_node = NULL;
+    int rowCount = 0;
 
     rewind(frp);
+    employee_t* current = *head;
+    while (!feof(frp)) {
 
-    char buf[10000];
+        fscanf(frp, "%f,%zu,%[^,],%s\n", &income, &SIN, firstName, lastName);
+        if ((new_node = createNode_LinkedList(income, SIN, firstName, lastName)) != NULL) {
 
-    int field_count=0;
-    
-    while(fgets(buf, 10000, frp)) {
-        printf("File to load records from:%s \n",IN_FILE);
-        field_count=0;
-        RMNR(buf);
-        // reference from https://codingboost.com/parsing-csv-files-in-c
-        char* field =strtok(buf, ",");
-        while(field) {
-            if (field_count %4== 0) {
-                income = strtof(field, NULL);
-            }
-            if (field_count %4== 1) {
-                SIN =strtol(field, NULL,0);
-            }
-            if (field_count %4== 2) {
-                strcpy(firstName, field);
-            }
-            if (field_count %4 == 3) {
-                strcpy(lastName, field);
-            }
-            FLUSH;
+            if (current == NULL) {
+                *head = new_node;
+                current = new_node;
+            } else {
 
-            field_count++;
-
-           if (field_count%4==0 && field_count>1) {
-                new_node = createNode_LinkedList(income, SIN, firstName, lastName);
-                if(*head==NULL) {
-                    *head = new_node;
-                } else {
-                    insertNode_LinkedList(new_node, head);
-                }
+                insertNode_LinkedList(new_node, head);
             }
-
-            field = strtok(NULL, ",");
         }
-        
-        printf("\n");
+        rowCount++;
 
     }
+    //}
+    printf("File to load records from:%s ...%d records loaded \n", IN_FILE, rowCount);
+
     fclose(frp);
 }
 
+
 //used inside of the readIn function to create a node for each record in the file
+
 employee_t* createNode_LinkedList(float income, size_t SIN, char firstName[], char lastName[]) {
 
     employee_t* node = NULL;
@@ -130,14 +110,15 @@ employee_t* createNode_LinkedList(float income, size_t SIN, char firstName[], ch
     return node;
 }
 // used inside of the readIn function to add the node to the front of linked list 
+
 void insertNode_LinkedList(employee_t* new_node, employee_t** head) {
 
     employee_t* current = *head;
     employee_t* insert = NULL;
-    
+
     new_node->next = *head;
     *head = new_node;
-   
+
 }
 
 void writeOutForLinkedList(employee_t * head) {
@@ -151,6 +132,11 @@ void writeOutForLinkedList(employee_t * head) {
     fgets(save, MAX_LEN, stdin);
     FLUSH;
     save[strcspn(save, "\n")] = 0;
+
+    if (!strlen(save)) {
+        printf("Data was not saved");
+        return;
+    }
 
 
     //if a file exits or not
@@ -182,6 +168,7 @@ void writeOutForLinkedList(employee_t * head) {
 
 
 }
+
 void writeOutForBST(BST_node* root, int option) {
 
     int no = 1;
@@ -194,10 +181,14 @@ void writeOutForBST(BST_node* root, int option) {
     FLUSH;
     save[strcspn(save, "\n")] = 0;
 
+    if (!strlen(save)) {
+        printf("Data was not saved");
+        return;
+    }
 
     //if a file exits or not
     if ((fwp = fopen(save, "r")) != NULL) {
-        printf("File %s already exit. Do you want to override it?(Y/N):", save);
+        printf("File %s already exist. Do you want to override it?(Y/N):", save);
 
         fgets(override, MAX_LEN, stdin);
         FLUSH;
@@ -214,7 +205,7 @@ void writeOutForBST(BST_node* root, int option) {
     }
 
     //save data to the file
-    if(option==1) {
+    if (option == 1) {
         sortByAscendingForWriteout(root, fwp);
     } else {
         sortByDescendingForWriteout(root, fwp);
@@ -223,6 +214,7 @@ void writeOutForBST(BST_node* root, int option) {
 
 
 }
+
 void sortByAscendingForWriteout(BST_node* root, FILE* fwp) {
     if (root != NULL) {
         sortByAscendingForWriteout(root->leftChild, fwp);
@@ -230,105 +222,85 @@ void sortByAscendingForWriteout(BST_node* root, FILE* fwp) {
         sortByAscendingForWriteout(root->rightChild, fwp);
     }
 }
+
 void sortByDescendingForWriteout(BST_node* root, FILE* fwp) {
     if (root != NULL) {
-        sortByDescendingForWriteout(root->rightChild,fwp);
+        sortByDescendingForWriteout(root->rightChild, fwp);
         fprintf(fwp, "%9f,%u,%s,%s\n", root->income, root->SIN, root->firstName, root->lastName);
-        sortByDescendingForWriteout(root->leftChild,fwp);
+        sortByDescendingForWriteout(root->leftChild, fwp);
     }
 }
 
 // this function collect input from console and then create a new node of employee_t for the linked list
+
 employee_t * createNewNode() {
 
     employee_t* node = NULL;
-
-
-    char firstName[MAX_LEN] = {0};
-    char lastName[MAX_LEN] = {0};
-    char income[MAX_LEN] = {0};
-    char SIN[MAX_LEN] = {0};
-
-
+    
+    size_t sin;
     do {
-        printf("SIN: ");
-        fgets(SIN, MAX_LEN, stdin);
-        FLUSH;
-        SIN[strcspn(SIN, "\n")] = 0;
-
-        if (strlen(SIN) != 9) {
+        sin = getSin();
+    if (sin<100000000) {
             printf("Incorrect SIN. Please try again. \n");
-
         }
-    } while (strlen(SIN) != 9);
-
-    do {
-        printf("First Name:");
-        fgets(firstName, MAX_LEN, stdin);
-        FLUSH;
-        firstName[strcspn(firstName, "\n")] = 0;
-
-        if (strlen(firstName) < 1) {
+    } while (sin<100000000);
+    char* firstName= NULL;
+    do{
+        firstName = getFirstName();
+        if (strlen(firstName) == 0) {
             printf("First Name cannot be empty \n");
         }
-    } while (strlen(firstName) < 1);
-
-    do {
-
-        printf("Last Name:");
-        fgets(lastName, MAX_LEN, stdin);
-        FLUSH;
-        lastName[strcspn(lastName, "\n")] = 0;
-        if (strlen(lastName) < 1) {
+    } while (strlen(firstName) ==0);
+    
+    char* lastName =NULL;
+    do{
+        lastName = getLastName();
+        if (strlen(lastName) == 0) {
             printf("Last Name cannot be empty \n");
         }
-    } while (strlen(lastName) < 1);
+    } while (strlen(lastName) ==0);
+    float income = getIncome();
+    
+    node = (employee_t*) malloc(sizeof (employee_t));
+    node->firstName = (char*) calloc(strlen(firstName) + 1, sizeof (char));
+    strcpy(node->firstName, firstName);
+    node->lastName = (char*) calloc(strlen(lastName) + 1, sizeof (char));
+    strcpy(node->lastName, lastName);
+    node->income = income;
 
-    do {
-        printf("Annual Income:");
-        fgets(income, MAX_LEN, stdin);
-        FLUSH;
-        income[strcspn(income, "\n")] = 0;
+    node->SIN = sin;
 
-        if (!(strtof(income, NULL) > 0)) {
-            printf("Incorrect income. Please try again.\n");
-        }
-    } while (!(strtof(income, NULL) > 0));
-
-    if (strlen(firstName) > 1) {
-        if (strtof(income, NULL) >= 0) {
-            node = (employee_t*) malloc(sizeof (employee_t));
-            if (node == NULL) {
-
-                printf("Cannot allocate memory for a student!");
-                exit(1);
-            }
-            node->firstName = (char*) calloc(strlen(firstName) + 1, sizeof (char));
-            strcpy(node->firstName, firstName);
-            node->lastName = (char*) calloc(strlen(lastName) + 1, sizeof (char));
-            strcpy(node->lastName, lastName);
-            node->income = strtof(income, NULL);
-            node->SIN = (size_t) strtol(SIN, NULL,0);
-
-            node->next = NULL;
-        }
-    }
+    node->next = NULL;
+        //}
+    //}
     return node;
+    
 }
-
 
 void addOperation() {
     employee_t* head = NULL;
     readIn_LinkedList(&head);
-    
+    do {
     employee_t* newNode = createNewNode();
-    insertNode_LinkedList(newNode,  &head);
-    
-    writeOutForLinkedList(head); 
-    
-     listRecord(head);
-    
-    
+    if(head==NULL) {
+        head = newNode;
+    } else {
+    insertNode_LinkedList(newNode, &head);
+    }
+    temp_BST == NULL;
+    printf("Add another record(Y/N)? \n");
+    fgets(temp_BST, MAX_LEN, stdin);
+    FLUSH;
+    RMNR(temp_BST);
+    if (!(strcmp(temp_BST, "N"))) {
+        break;
+    }
+    } while (1);
+   
+
+    writeOutForLinkedList(head);
+    listRecord(head);
+
 }
 
 void removeList(employee_t** head) {
@@ -374,53 +346,60 @@ void deleteOperation() {
 
     switch (option) {
         case 1:
-            SIN = getSin();
-            printf("Deleting record(s) with SIN \"%zd\": \n", SIN);
             count = 0;
-            deleteNodeBySIN(&head, SIN);
-            if(count==0) {
-                printf("no matching record! no deletion!\n");
-            }
+            do {
+                SIN = getSin();
+                printf("Deleting record(s) with SIN \"%zd\": \n", SIN);
+                deleteNodeBySIN(&head, SIN);
+                if (count == 0) {
+                    printf("no matching record! no deletion!\n");
+                }
+            } while (count == 0);
             writeOutForLinkedList(head);
             break;
         case 2:
-            firstName = getFirstName();
-            printf("Deleting record(s) with first name \"%s\": \n", firstName);
-            count=0;
-            deleteNodeByFirstName(&head, firstName);
-            if(count==0) {
-                printf("no matching record! no deletion!\n");
-            }
+            count = 0;
+            do {
+                firstName = getFirstName();
+                printf("Deleting record(s) with first name \"%s\": \n", firstName);
+
+                deleteNodeByFirstName(&head, firstName);
+                if (count == 0) {
+                    printf("no matching record! no deletion!\n");
+                }
+            } while (count == 0);
             free(firstName);
             writeOutForLinkedList(head);
             break;
         case 3:
-            lastName = getLastName();
-            printf("Deleting record(s) with last name \"%s\": \n", lastName);
-            count=0;
-            deleteNodeByLastName(&head, lastName);
-            if(count==0) {
-                printf("no matching record! no deletion!\n");
-            }
+            count = 0;
+            do {
+                lastName = getLastName();
+                printf("Deleting record(s) with last name \"%s\": \n", lastName);
+
+                deleteNodeByLastName(&head, lastName);
+                if (count == 0) {
+                    printf("no matching record! no deletion!\n");
+                }
+            } while (count == 0);
             free(lastName);
             writeOutForLinkedList(head);
             break;
         case 4:
-            income = getIncome();
-            printf("Deleting record(s) with income \"%f\": \n", income);
             count = 0;
-            deleteNodeByIncome(&head, income);
-            if(count==0) {
-                printf("no matching record! no deletion!\n");
-            }
+            do {
+                income = getIncome();
+                printf("Deleting record(s) with income \"%f\": \n", income);
+                deleteNodeByIncome(&head, income);
+                if (count == 0) {
+                    printf("no matching record! no deletion!\n");
+                }
+            } while (count == 0);
             writeOutForLinkedList(head);
             break;
         default:
             printf("Error! operator is not correct");
     }
-
-    listRecord(head);
-
 
 
 }
@@ -500,26 +479,16 @@ void deleteNodeByIncome(employee_t** head, float income) {
 }
 
 void deleteNodeByFirstName(employee_t** head, char* firstName) {
-    //if the list has only one node and this node is the one needed to be deleted
-    while (strcmp((*head)->firstName, firstName) == 0) {
+    //delete the head， using the while loop for nodes that have the same value 
+    while (!(strcmp((*head)->firstName, firstName))) {
         if ((*head)->next != NULL) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", (*head)->SIN, (*head)->firstName, (*head)->lastName, (*head)->income);
             removeFirst(head);
             count++;
         }
     }
-    // delete the last node 
-    employee_t* current = *head;
-    while (current->next != NULL) {
-        current = current ->next;
-    }
-    if (strcmp(current->firstName, firstName) == 0) {
-        printf(" %zu      %-8s      %-8s      %-5.2f      \n", current->SIN, current->firstName, current->lastName, current->income);
-        removeLast(head);
-        count++;
-    }
 
-    current = *head;
+    employee_t* current = *head;
     employee_t* temp = NULL;
     while (current->next != NULL) {
         if (strcmp(current->next ->firstName, firstName) == 0) {
@@ -531,6 +500,20 @@ void deleteNodeByFirstName(employee_t** head, char* firstName) {
         }
         current = current ->next;
     }
+
+    // delete the last node 
+    current = *head;
+    while (current->next != NULL) {
+        current = current ->next;
+    }
+    if (!(strcmp(current->firstName, firstName))) {
+        printf(" %zu      %-8s      %-8s      %-5.2f      \n", current->SIN, current->firstName, current->lastName, current->income);
+        removeLast(head);
+        count++;
+    }
+
+
+
 
 
 }
@@ -571,119 +554,52 @@ void deleteNodeByLastName(employee_t** head, char* lastName) {
 
 }
 
-
-void readIn_BST(BST_node** root) {
-    FILE *frp;
-    if ((frp = fopen(IN_FILE, "r")) == NULL) {
-        perror("Could not open quotes file to input!\n");  
-        exit(1);
-    }
-    char firstName[MAX_LEN];
-    char lastName[MAX_LEN];
-    float income;
-    size_t SIN;
-    BST_node* new_node = NULL;
-
-    rewind(frp);
-
-    char buf[10000];
-
-    int field_count=0;
-    int row_count=0;
-    
-    while(fgets(buf, 10000, frp)) {
-        
-        field_count=0;
-        RMNR(buf);
-        // reference from https://codingboost.com/parsing-csv-files-in-c
-        char* field =strtok(buf, ",");
-        while(field) {
-            if (field_count %4== 0) {
-                income = strtof(field, NULL);
-                printf("Income:\t %f\n", income);
-            }
-            if (field_count %4== 1) {
-                SIN =strtol(field, NULL,0);
-                printf("SIN:\t %zd\n", SIN);
-            }
-            if (field_count %4== 2) {
-                strcpy(firstName, field);
-                printf("First Name:\t %s\n", firstName);
-            }
-            if (field_count %4 == 3) {
-                strcpy(lastName, field);
-                printf("Last Name:\t %s\n", lastName);
-            }
-            FLUSH;
-
-            field_count++;
-
-           if (field_count%4==0 && field_count>1) {
-                new_node = loadNode_BST(income, SIN, firstName, lastName);
-                row_count++;
-                if(*root==NULL) {
-                    *root = new_node;
-                } else {
-                    insertNode_BST(root,new_node);
-                }
-            }
-            printf("the filed count is %d: \n", field_count);
-            field = strtok(NULL, ",");
-        }
-        
-        printf("\n");
-
-    }
-    fclose(frp);
-    printf("File to load records from:%s ... %d records loaded\n",IN_FILE, row_count);
-}
-
 BST_node* loadNode_BST(float income, size_t SIN, char firstName[], char lastName[]) {
-     BST_node* bst = (BST_node*) malloc(sizeof (BST_node));
-     bst->firstName = (char*)calloc(strlen(firstName)+1, sizeof(char));
-     bst->lastName = (char*)calloc(strlen(lastName)+1, sizeof(char));
-     
-     
-    if (bst == NULL || bst->firstName ==NULL || bst->lastName ==NULL) {
+    BST_node* bst = (BST_node*) malloc(sizeof (BST_node));
+    bst->firstName = (char*) calloc(strlen(firstName) + 1, sizeof (char));
+    bst->lastName = (char*) calloc(strlen(lastName) + 1, sizeof (char));
+
+
+    if (bst == NULL || bst->firstName == NULL || bst->lastName == NULL) {
         printf("Cannot allocate memory for a node!\n");
         exit(-1);
     }
-    
-     bst->income = income;
-     bst->SIN = SIN;
-     strcpy(bst->firstName, firstName);
-     strcpy(bst->lastName,lastName);
+
+    bst->income = income;
+    bst->SIN = SIN;
+    strcpy(bst->firstName, firstName);
+    strcpy(bst->lastName, lastName);
 
     bst->leftChild = NULL;
     bst->rightChild = NULL;
 
     return bst;
 
-    
+
 }
 
-void insertNode_BST(BST_node** root, BST_node* node){
+void insertNode_BST(BST_node** root, BST_node* node) {
     BST_node * current;
     BST_node* parent;
 
-        current = *root;
-        parent = NULL;
-        do {
-            parent = current;
-            //go left from parent
-            if (node->SIN < parent->SIN) {
-                current = current ->leftChild;
-                if (current == NULL) {
-                    parent->leftChild = node;
-                }
-            } else {
-                current = current ->rightChild;
-                if (current == NULL) {
-                    parent->rightChild = node;
-                }
+    current = *root;
+    parent = NULL;
+    do {
+        parent = current;
+        //go left from parent
+        if (node->SIN < parent->SIN) {
+            current = current ->leftChild;
+            if (current == NULL) {
+                parent->leftChild = node;
             }
-        } while (current != NULL);
-        
+        } else {
+            current = current ->rightChild;
+            if (current == NULL) {
+                parent->rightChild = node;
+            }
+        }
+    } while (current != NULL);
+
 }
 
 void displayBST(BST_node* root) {
@@ -699,6 +615,7 @@ void displayBST(BST_node* root) {
     }
 }
 //inorder 
+
 void tree_traversal(BST_node* root) {
     if (root != NULL) {
         tree_traversal(root->leftChild);
@@ -708,204 +625,207 @@ void tree_traversal(BST_node* root) {
 }
 
 // below functions for BST FIND operation 
+
 void findOperation() {
     BST_node* root = NULL;
     BST_node* root_result = NULL;
-    
+
     int option;
-    count=0;
     size_t SIN;
     float income;
     char* firstName;
     char* lastName;
 
-    
+
     printf("Please select the attribute (1=SIN, 2 =First Name, 3=Last Name, 4=Annual Income: \n");
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
-    option =strtol(temp_BST, NULL,0);   
-    temp_BST == NULL; 
-    readIn_BST(&root);  
+    option = strtol(temp_BST, NULL, 0);
+    temp_BST == NULL;
+    readIn_BST(&root);
 
     switch (option) {
-            case 1: 
+        case 1:
+            count=0;
+            do {
                 SIN = getSin();
+                if(SIN==0) {
+                    break;
+                }
                 printf("Displaying record(s) with SIN \"%zd\": \n", SIN);
-                count=0;
-                tree_traversalBySin(root, SIN, &root_result);  
-                writeOutForBST(root_result, 1);
-                break;
-            case 2: 
-                count=0;
+                tree_traversalBySin(root, SIN, &root_result);
+                if (count == 0) {
+                    printf("no record found!\n");
+                }
+            } while (1);
+            writeOutForBST(root_result, 1);
+            break;
+        case 2:
+            count=0;
+            do {
                 firstName = getFirstName();
+                if(!(strcmp(firstName, ""))) {
+                    break;
+                }
                 printf("Displaying record(s) with first name \"%s\": \n", firstName);
-                tree_traversalByFirstName(root,firstName,&root_result);
-                writeOutForBST(root_result, 1);
-                free(firstName);
-                break;
-            case 3:
-               count=0;
+                tree_traversalByFirstName(root, firstName, &root_result);
+                if (count == 0) {
+                    printf("no record found! \n");
+                }
+            } while (1);
+            writeOutForBST(root_result, 1);
+            free(firstName);
+            break;
+        case 3:
+            count=0;
+            do {
                 lastName = getLastName();
+                if(!(strcmp(lastName, ""))) {
+                    break;
+                }
                 printf("Displaying record(s) with last name \"%s\": \n", lastName);
-                tree_traversalByLastName(root,lastName,&root_result);
-                writeOutForBST(root_result, 1);
-                free(lastName);
-               break;
-            case 4: 
-                income=getIncome();
+                tree_traversalByLastName(root, lastName, &root_result);
+                if (count==0) {
+                    printf("no record found!\n");
+                }
+            } while (1);
+            writeOutForBST(root_result, 1);
+            free(lastName);
+            break;
+        case 4:
+            count=0;
+            do {
+                income = getIncome();
+                if(income<0) {
+                    break;
+                }                
                 printf("Displaying record(s) with income \"%5.2f\": \n", income);
-                count=0;
-                tree_traversalByIncome(root,income,&root_result);
-                writeOutForBST(root_result, 1);
-                break;
-            default: 
-                printf("Error! operator is not correct");
-        }
-    
-    if(count==0) {
-                printf("No records found!\n");
-            }
+                tree_traversalByIncome(root, income, &root_result);
+                if (count==0) {
+                    printf("no record found!\n");
+                }
+            } while (1);
+            writeOutForBST(root_result, 1);
+            break;
+        default:
+            printf("Error! operator is not correct");
+    }
 
-      displayBST(root);
-    
-    
+
+
+    displayBST(root);
+
 }
 
 //get the input of SIN from console
+
 size_t getSin() {
     size_t SIN;
-    do {
-    printf("Please provide the SIN: \n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-   
-    
-    if (strlen(temp_BST) != 9) {
-            printf("Incorrect SIN. Please try again. \n");
-        }
+ 
+        printf("Please provide the SIN: \n");
+        fgets(temp_BST, MAX_LEN, stdin);
+        FLUSH;
+        RMNR(temp_BST);
 
-    } while(strlen(temp_BST) <9); 
-    
-    SIN = (size_t) strtol(temp_BST, NULL,0);
-    
-    
+    SIN = (size_t) strtol(temp_BST, NULL, 0);
+
+
     return SIN;
 }
 
 //get the input of SIN from console
-size_t getIncome() {
+
+float getIncome() {
     char temp_BST[MAX_LEN];
     float income;
-    //do {
-    printf("Please provide the income: \n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-/*
-    if (strlen(temp_BST) <=0) {
-            printf("Incorrect income. Please try again. \n");
-        }
-*/
-    //} while(strlen(temp_BST) <=0); 
-    income = strtof(temp_BST, NULL);
-    
+
+        printf("Please provide the income: (negative to skip) \n");
+        fgets(temp_BST, MAX_LEN, stdin);
+        FLUSH;
+        RMNR(temp_BST);
+        income = strtof(temp_BST, NULL);
+
     return income;
 }
 
 //get the input of first name from console
-char* getFirstName() {
-   // do {
-    printf("Please provide the first name: (Press enter to skip)\n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-/*
-    if (strlen(temp_BST) <0) {
-            printf("First Name cannot be empty \n");
-        }
-*/
-    //} while(strlen(temp_BST) <0); 
 
-    char* firstName = (char*) malloc((strlen(temp_BST)+1)*sizeof(char));
+char* getFirstName() {
+
+        printf("Please provide the first name: \n");
+        fgets(temp_BST, MAX_LEN, stdin);
+        FLUSH;
+        RMNR(temp_BST);
+
+    char* firstName = (char*) malloc((strlen(temp_BST) + 1) * sizeof (char));
     strcpy(firstName, temp_BST);
-    
 
     return firstName;
-    
- 
+
 }
 //get the input of the last name from console
-char* getLastName() {
-    //do {
-    printf("Please provide the last name: (Press enter to skip)\n");
-    fgets(temp_BST, MAX_LEN, stdin);
-    FLUSH;
-    RMNR(temp_BST);
-/*
-    if (strlen(temp_BST) <0) {
-            printf("First Name cannot be empty \n");
-        }
-*/
-    //} while(strlen(temp_BST) <0); 
 
-    char* lastName = (char*) malloc((strlen(temp_BST)+1)*sizeof(char));
+char* getLastName() {
+
+        printf("Please provide the last name: \n");
+        fgets(temp_BST, MAX_LEN, stdin);
+        FLUSH;
+        RMNR(temp_BST);
+
+    char* lastName = (char*) malloc((strlen(temp_BST) + 1) * sizeof (char));
     strcpy(lastName, temp_BST);
-    
 
     return lastName;
-    
+
 }
 
 void tree_traversalBySin(BST_node* root, size_t SIN, BST_node** root_result) {
 
-    if (root != NULL) {
-
-        if(root->SIN == SIN) {
-            printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
-            BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
-            if(*root_result==NULL) {
-                *root_result = newNode;
-            } else {
-                insertNode_BST(root_result, newNode);
-            }
-            count++;
+    BST_node* current = root;
+    while (current != NULL && current->SIN != SIN) {
+        current = (current->SIN > SIN) ? current->leftChild : current->rightChild;
+    }
+    if (current != NULL) {
+        printf(" %zu      %-8s      %-8s      %-5.2f      \n", current->SIN, current->firstName, current->lastName, current->income);
+        BST_node* newNode = loadNode_BST(current->income, current->SIN, current->firstName, current->lastName);
+        if (*root_result == NULL) {
+            *root_result = newNode;
+        } else {
+            insertNode_BST(root_result, newNode);
         }
-        tree_traversalBySin(root->leftChild, SIN, root_result);
-        tree_traversalBySin(root->rightChild, SIN,root_result);
+        count++;
     }
 
-    
 }
 
-void tree_traversalByIncome(BST_node* root, float income,BST_node** root_result) {
-     
+void tree_traversalByIncome(BST_node* root, float income, BST_node** root_result) {
+
     if (root != NULL) {
 
-        if(root->income == income) {
+        if (root->income == income) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
             BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
-            if(*root_result==NULL) {
+            if (*root_result == NULL) {
                 *root_result = newNode;
             } else {
                 insertNode_BST(root_result, newNode);
             }
             count++;
         }
-        tree_traversalByIncome(root->leftChild, income,root_result);
-        tree_traversalByIncome(root->rightChild, income,root_result);
+        tree_traversalByIncome(root->leftChild, income, root_result);
+        tree_traversalByIncome(root->rightChild, income, root_result);
     }
-    
+
 }
 
 void tree_traversalByFirstName(BST_node* root, char* firstName, BST_node** root_result) {
 
     if (root != NULL) {
-        if(! strcmp(root->firstName, firstName)) {
+        if (!strcmp(root->firstName, firstName)) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
             BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
-            if(*root_result==NULL) {
+            if (*root_result == NULL) {
                 *root_result = newNode;
             } else {
                 insertNode_BST(root_result, newNode);
@@ -913,24 +833,25 @@ void tree_traversalByFirstName(BST_node* root, char* firstName, BST_node** root_
             count++;
         }
 
-        tree_traversalByFirstName(root->leftChild, firstName,root_result);
-        tree_traversalByFirstName(root->rightChild, firstName,root_result);
+        tree_traversalByFirstName(root->leftChild, firstName, root_result);
+        tree_traversalByFirstName(root->rightChild, firstName, root_result);
     }
 }
-void tree_traversalByLastName(BST_node* root, char* lastName,BST_node** root_result) {
+
+void tree_traversalByLastName(BST_node* root, char* lastName, BST_node** root_result) {
 
     if (root != NULL) {
-        if(! strcmp(root->lastName, lastName)) {
+        if (!strcmp(root->lastName, lastName)) {
             printf(" %zu      %-8s      %-8s      %-5.2f      \n", root->SIN, root->firstName, root->lastName, root->income);
             BST_node* newNode = loadNode_BST(root->income, root->SIN, root->firstName, root->lastName);
-            if(*root_result==NULL) {
+            if (*root_result == NULL) {
                 *root_result = newNode;
             } else {
                 insertNode_BST(root_result, newNode);
             }
             count++;
         }
-        
+
         tree_traversalByLastName(root->leftChild, lastName, root_result);
         tree_traversalByLastName(root->rightChild, lastName, root_result);
     }
@@ -967,7 +888,7 @@ void removeLast(employee_t ** head) {
 }
 
 void sortOperation() {
-    
+
     BST_node* root = NULL;
     int option;
     //read the record in the file and create a linked list 
@@ -975,156 +896,153 @@ void sortOperation() {
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
-    option =strtol(temp_BST, NULL,0);   
+    option = strtol(temp_BST, NULL, 0);
     temp_BST == NULL;
-    
+
     printf("Please select order(1=Ascending, 2=Descending): \n");
     fgets(temp_BST, MAX_LEN, stdin);
     FLUSH;
     RMNR(temp_BST);
-    
+
     switch (option) {
-        case 1: 
+        case 1:
             readIn_BSTForSort(&root, 1);
-            if(strtol(temp_BST, NULL, 0)==1) {
+            if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by SIN in ascending order: \n");
-               sortByAscending(root);
-               writeOutForBST(root, 1);
+                sortByAscending(root);
             } else {
                 printf("Displaying records sorted by SIN in descending order: \n");
                 sortByDescending(root);
-                writeOutForBST(root, 2);
             }
             break;
-        case 2: 
+        case 2:
             readIn_BSTForSort(&root, 2);
-            if(strtol(temp_BST, NULL, 0)==1) {
+            if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by first name in ascending order: \n");
-               sortByAscending(root);
-               writeOutForBST(root, 1);
+                sortByAscending(root);
             } else {
                 printf("Displaying records sorted by first name in descending order: \n");
                 sortByDescending(root);
-                writeOutForBST(root, 2);
             }
             break;
         case 3:
             readIn_BSTForSort(&root, 3);
-            if(strtol(temp_BST, NULL, 0)==1) {
+            if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by income in ascending order: \n");
-               sortByAscending(root);
-               writeOutForBST(root, 1);
+                sortByAscending(root);
             } else {
                 printf("Displaying records sorted by income in descending order: \n");
                 sortByDescending(root);
-                writeOutForBST(root, 2);
             }
             break;
         case 4:
             readIn_BSTForSort(&root, 4);
-            if(strtol(temp_BST, NULL, 0)==1) {
+            if (strtol(temp_BST, NULL, 0) == 1) {
                 printf("Displaying records sorted by income in ascending order: \n");
-               sortByAscending(root);
-               writeOutForBST(root, 1);
+                sortByAscending(root);
             } else {
                 printf("Displaying records sorted by income in descending order: \n");
                 sortByDescending(root);
-                writeOutForBST(root, 2);
             }
             break;
         default:
             printf("Error! operator is not correct");
     }
-    
+
 }
+
 void insertNode_BSTByFirstNameForSort(BST_node** root, BST_node* node) {
     BST_node * current;
     BST_node* parent;
 
-        current = *root;
-        parent = NULL;
-        do {
-            parent = current;
-            //go left from parent
-            if (strcmp(node->firstName, parent->firstName)<=0) {
-                current = current ->leftChild;
-                if (current == NULL) {
-                    parent->leftChild = node;
-                }
-            } else {
-                current = current ->rightChild;
-                if (current == NULL) {
-                    parent->rightChild = node;
-                }
+    current = *root;
+    parent = NULL;
+    do {
+        parent = current;
+        //go left from parent
+        if (strcmp(node->firstName, parent->firstName) <= 0) {
+            current = current ->leftChild;
+            if (current == NULL) {
+                parent->leftChild = node;
             }
-        } while (current != NULL); 
+        } else {
+            current = current ->rightChild;
+            if (current == NULL) {
+                parent->rightChild = node;
+            }
+        }
+    } while (current != NULL);
 }
+
 void insertNode_BSTByLastNameForSort(BST_node** root, BST_node* node) {
     BST_node * current;
     BST_node* parent;
 
-        current = *root;
-        parent = NULL;
-        do {
-            parent = current;
-            //go left from parent
-            if (strcmp(node->lastName, parent->lastName)<=0) {
-                current = current ->leftChild;
-                if (current == NULL) {
-                    parent->leftChild = node;
-                }
-            } else {
-                current = current ->rightChild;
-                if (current == NULL) {
-                    parent->rightChild = node;
-                }
+    current = *root;
+    parent = NULL;
+    do {
+        parent = current;
+        //go left from parent
+        if (strcmp(node->lastName, parent->lastName) <= 0) {
+            current = current ->leftChild;
+            if (current == NULL) {
+                parent->leftChild = node;
             }
-        } while (current != NULL); 
+        } else {
+            current = current ->rightChild;
+            if (current == NULL) {
+                parent->rightChild = node;
+            }
+        }
+    } while (current != NULL);
 }
+
 void insertNode_BSTBySinForSort(BST_node** root, BST_node* node) {
     BST_node * current;
     BST_node* parent;
 
-        current = *root;
-        parent = NULL;
-        do {
-            parent = current;
-            //go left from parent
-            if (node->SIN < parent->SIN) {
-                current = current ->leftChild;
-                if (current == NULL) {
-                    parent->leftChild = node;
-                }
-            } else {
-                current = current ->rightChild;
-                if (current == NULL) {
-                    parent->rightChild = node;
-                }
+    current = *root;
+    parent = NULL;
+    do {
+        parent = current;
+        //go left from parent
+        if (node->SIN < parent->SIN) {
+            current = current ->leftChild;
+            if (current == NULL) {
+                parent->leftChild = node;
             }
-        } while (current != NULL); 
+        } else {
+            current = current ->rightChild;
+            if (current == NULL) {
+                parent->rightChild = node;
+            }
+        }
+    } while (current != NULL);
 }
+
 void insertNode_BSTByIncomeForSort(BST_node** root, BST_node* node) {
     BST_node * current;
     BST_node* parent;
 
-        current = *root;
-        parent = NULL;
-        do {
-            parent = current;
-            //go left from parent
-            if (node->income < parent->income) {
-                current = current ->leftChild;
-                if (current == NULL) {
-                    parent->leftChild = node;
-                }
-            } else {
-                current = current ->rightChild;
-                if (current == NULL) {
-                    parent->rightChild = node;
-                }
+    current = *root;
+    parent = NULL;
+    do {
+        parent = current;
+        //go left from parent
+        if (node->income < parent->income) {
+            current = current ->leftChild;
+            if (current == NULL) {
+                parent->leftChild = node;
             }
-        } while (current != NULL); 
+        } else {
+            current = current ->rightChild;
+            if (current == NULL) {
+                parent->rightChild = node;
+            }
+        }
+    } while (current != NULL);
 }
+
 void sortByAscending(BST_node* root) {
     if (root != NULL) {
         sortByAscending(root->leftChild);
@@ -1132,6 +1050,7 @@ void sortByAscending(BST_node* root) {
         sortByAscending(root->rightChild);
     }
 }
+
 void sortByDescending(BST_node* root) {
     if (root != NULL) {
         sortByDescending(root->rightChild);
@@ -1139,10 +1058,12 @@ void sortByDescending(BST_node* root) {
         sortByDescending(root->leftChild);
     }
 }
-void readIn_BSTForSort(BST_node** root, int option) {
+
+void readIn_BST(BST_node** root) {
+
     FILE *frp;
     if ((frp = fopen(IN_FILE, "r")) == NULL) {
-        perror("Could not open quotes file to input!\n");  
+        perror("Could not open quotes file to input!\n");
         exit(1);
     }
     char firstName[MAX_LEN];
@@ -1150,71 +1071,78 @@ void readIn_BSTForSort(BST_node** root, int option) {
     float income;
     size_t SIN;
     BST_node* new_node = NULL;
+    int rowCount = 0;
 
     rewind(frp);
+    BST_node* current = *root;
+    while (!feof(frp)) {
 
-    char buf[10000];
+        fscanf(frp, "%f,%u,%[^,],%s\n", &income, &SIN, firstName, lastName);
+        if ((new_node = loadNode_BST(income, SIN, firstName, lastName)) != NULL) {
 
-    int field_count=0;
-    int row_count=0;
-    
-    while(fgets(buf, 10000, frp)) {
-        
-        field_count=0;
-        RMNR(buf);
-        // reference from https://codingboost.com/parsing-csv-files-in-c
-        char* field =strtok(buf, ",");
-        while(field) {
-            if (field_count %4== 0) {
-                income = strtof(field, NULL);
-                printf("Income:\t %f\n", income);
-            }
-            if (field_count %4== 1) {
-                SIN =strtol(field, NULL,0);
-                printf("SIN:\t %zd\n", SIN);
-            }
-            if (field_count %4== 2) {
-                strcpy(firstName, field);
-                printf("First Name:\t %s\n", firstName);
-            }
-            if (field_count %4 == 3) {
-                strcpy(lastName, field);
-                printf("Last Name:\t %s\n", lastName);
-            }
-            FLUSH;
+            if (current == NULL) {
+                *root = new_node;
+                current = new_node;
+            } else {
 
-            field_count++;
-
-           if (field_count%4==0 && field_count>1) {
-                new_node = loadNode_BST(income, SIN, firstName, lastName);
-                row_count++;
-                if(*root==NULL) {
-                    *root = new_node;
-                } else {
-                    switch (option) {
-                        case 1: 
-                            insertNode_BSTBySinForSort(root,new_node);
-                            break;
-                        case 2: 
-                            insertNode_BSTByFirstNameForSort(root,new_node);
-                            break;
-                        case 3: 
-                            insertNode_BSTByLastNameForSort(root,new_node);
-                            break;
-                        case 4: 
-                            insertNode_BSTByIncomeForSort(root,new_node);
-                            break;
-                    }
-                    
-                }
+                insertNode_BST(root, new_node);
             }
-            printf("the filed count is %d: \n", field_count);
-            field = strtok(NULL, ",");
         }
-        
-        printf("\n");
+        rowCount++;
 
     }
+    //}
+    printf("File to load records from:%s ...%d records loaded \n", IN_FILE, rowCount);
+
     fclose(frp);
-    printf("File to load records from:%s ... %d records loaded\n",IN_FILE, row_count);
 }
+
+void readIn_BSTForSort(BST_node** root, int option) {
+    FILE *frp;
+    if ((frp = fopen(IN_FILE, "r")) == NULL) {
+        perror("Could not open quotes file to input!\n");
+        exit(1);
+    }
+    char firstName[MAX_LEN];
+    char lastName[MAX_LEN];
+    float income;
+    size_t SIN;
+    BST_node* new_node = NULL;
+    int rowCount = 0;
+
+    rewind(frp);
+    BST_node* current = *root;
+    while (!feof(frp)) {
+
+        fscanf(frp, "%f,%u,%[^,],%s\n", &income, &SIN, firstName, lastName);
+        if ((new_node = loadNode_BST(income, SIN, firstName, lastName)) != NULL) {
+
+            if (current == NULL) {
+                *root = new_node;
+                current = new_node;
+            } else {
+                switch (option) {
+                    case 1:
+                        insertNode_BSTBySinForSort(root, new_node);
+                        break;
+                    case 2:
+                        insertNode_BSTByFirstNameForSort(root, new_node);
+                        break;
+                    case 3:
+                        insertNode_BSTByLastNameForSort(root, new_node);
+                        break;
+                    case 4:
+                        insertNode_BSTByIncomeForSort(root, new_node);
+                        break;
+                }
+            }
+            rowCount++;
+
+        }
+        }
+        printf("File to load records from:%s ...%d records loaded \n", IN_FILE, rowCount);
+
+        fclose(frp);
+
+
+    }
